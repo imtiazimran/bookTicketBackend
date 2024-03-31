@@ -1,0 +1,6 @@
+
+
+type Tuser = {
+    name: string,
+        
+}
