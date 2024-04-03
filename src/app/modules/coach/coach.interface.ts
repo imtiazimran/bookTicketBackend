@@ -7,5 +7,6 @@ type TCoach = {
     bookedSeats: string[]
     departure: Date
     price: number
-    seats: number
+    seats: number,
+    updatedAt: any
 }
