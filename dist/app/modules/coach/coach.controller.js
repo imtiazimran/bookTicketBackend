@@ -24,13 +24,22 @@ const createNewCoach = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
     });
 }));
 const getCoaches = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const coach = yield coach_service_1.CoachService.getCoachesDB();
+    const coaches = yield coach_service_1.CoachService.getCoachesDB();
+    const sortedCoaches = coaches.sort((a, b) => b.updatedAt - a.updatedAt);
     res.status(200).json({
         success: true,
         message: "Coaches fetched successfully",
-        coach
+        coach: sortedCoaches
     });
 }));
+// const getCoaches = catchAsynce(async (req, res) => {
+//     const coaches = await CoachService.getCoachesDB().sort({ updatedAt: -1 }).exec();
+//     res.status(200).json({
+//         success: true,
+//         message: "Coaches fetched successfully",
+//         coaches
+//     });
+// });
 const getCoach = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const coach = yield coach_service_1.CoachService.getCoachDB(req.params.id);
     res.status(200).json({
@@ -50,8 +59,8 @@ const updateCoach = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
 const bookSeat = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const { seatNumbers } = req.body;
-        const coach = yield coach_service_1.CoachService.bookSeatDB(id, seatNumbers);
+        const { bookedSeats } = req.body;
+        const coach = yield coach_service_1.CoachService.bookSeatDB(id, bookedSeats);
         res.status(200).json({
             success: true,
             message: "Seat booked successfully",

@@ -15,6 +15,7 @@ const updateCoachDB = async (id: string, data: TCoach) => {
 }
 
 const bookSeatDB = async (id: string, seatNumbers: string[]) => {
+    console.log(id, seatNumbers)
     try {
         const coach = await Coach.findById(id);
 

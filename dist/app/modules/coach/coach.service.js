@@ -24,6 +24,7 @@ const updateCoachDB = (id, data) => __awaiter(void 0, void 0, void 0, function* 
     return coach;
 });
 const bookSeatDB = (id, seatNumbers) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(id, seatNumbers);
     try {
         const coach = yield coach_model_1.Coach.findById(id);
         if (!coach) {

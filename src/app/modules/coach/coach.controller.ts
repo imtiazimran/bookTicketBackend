@@ -12,11 +12,10 @@ const createNewCoach = catchAsynce(async (req, res) => {
 const getCoaches = catchAsynce(async (req, res) => {
     const coaches = await CoachService.getCoachesDB();
     const sortedCoaches = coaches.sort((a, b) => b.updatedAt - a.updatedAt);
-    console.log(sortedCoaches)
     res.status(200).json({
         success: true,
         message: "Coaches fetched successfully",
-        coaches: sortedCoaches
+        coach: sortedCoaches
     });
 });
 
@@ -52,9 +51,9 @@ const updateCoach = catchAsynce(async (req, res) => {
 const bookSeat = catchAsynce(async (req, res) => {
     try {
         const { id } = req.params;
-        const { seatNumbers } = req.body;
+        const { bookedSeats } = req.body;
 
-        const coach = await CoachService.bookSeatDB(id, seatNumbers);
+        const coach = await CoachService.bookSeatDB(id, bookedSeats);
         
         res.status(200).json({
             success: true,
