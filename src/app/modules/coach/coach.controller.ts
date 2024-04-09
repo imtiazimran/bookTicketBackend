@@ -1,7 +1,9 @@
-import catchAsynce from "../../utils/catchAsync";
+
+import catchAsync from "../../utils/catchAsync";
 import { CoachService } from "./coach.service";
 
-const createNewCoach = catchAsynce(async (req, res) => {
+
+const createNewCoach = catchAsync(async (req, res) => {
     const coach = await CoachService.createNewCoachDB(req.body)
     res.status(201).json({
         success: true,
@@ -9,7 +11,8 @@ const createNewCoach = catchAsynce(async (req, res) => {
         coach
     })
 })
-const getCoaches = catchAsynce(async (req, res) => {
+
+const getCoaches = catchAsync(async (req, res) => {
     const coaches = await CoachService.getCoachesDB();
     const sortedCoaches = coaches.sort((a, b) => b.updatedAt - a.updatedAt);
     res.status(200).json({
@@ -19,18 +22,7 @@ const getCoaches = catchAsynce(async (req, res) => {
     });
 });
 
-// const getCoaches = catchAsynce(async (req, res) => {
-//     const coaches = await CoachService.getCoachesDB().sort({ updatedAt: -1 }).exec();
-//     res.status(200).json({
-//         success: true,
-//         message: "Coaches fetched successfully",
-//         coaches
-//     });
-// });
-
-
-
-const getCoach = catchAsynce(async (req, res) => {
+const getCoach = catchAsync(async (req, res) => {
     const coach = await CoachService.getCoachDB(req.params.id)
     res.status(200).json({
         success: true,
@@ -39,7 +31,7 @@ const getCoach = catchAsynce(async (req, res) => {
     })
 })
 
-const updateCoach = catchAsynce(async (req, res) => {
+const updateCoach = catchAsync(async (req, res) => {
     const coach = await CoachService.updateCoachDB(req.params.id, req.body)
     res.status(200).json({
         success: true,
@@ -48,13 +40,18 @@ const updateCoach = catchAsynce(async (req, res) => {
     })
 })
 
-const bookSeat = catchAsynce(async (req, res) => {
+const bookSeat = catchAsync(async (req, res) => {
     try {
         const { id } = req.params;
         const { bookedSeats } = req.body;
 
+        // if (!wss) {
+        //     throw new Error('WebSocket server is not initialized');
+        // }
+
+        // Call bookSeatDB with wss instance
         const coach = await CoachService.bookSeatDB(id, bookedSeats);
-        
+
         res.status(200).json({
             success: true,
             message: "Seat booked successfully",
@@ -66,13 +63,13 @@ const bookSeat = catchAsynce(async (req, res) => {
     }
 });
 
-const unBookSeat = catchAsynce(async (req, res) => {
+const unBookSeat = catchAsync(async (req, res) => {
     try {
         const { id } = req.params;
         const { seatNumbers } = req.body;
 
         const coach = await CoachService.unbookSeatDB(id, seatNumbers);
-        
+
         res.status(200).json({
             success: true,
             message: "Seat booked successfully",
@@ -84,9 +81,7 @@ const unBookSeat = catchAsynce(async (req, res) => {
     }
 });
 
-
-
-const deleteCoach = catchAsynce(async (req, res) => {
+const deleteCoach = catchAsync(async (req, res) => {
     const coach = await CoachService.deleteCoachDB(req.params.id)
     res.status(200).json({
         success: true,

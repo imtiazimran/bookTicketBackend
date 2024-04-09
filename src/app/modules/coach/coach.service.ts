@@ -1,3 +1,5 @@
+import { WebSocket } from "ws"
+import { wss } from "../../server"
 import { Coach } from "./coach.model"
 
 const createNewCoachDB = async (data: TCoach) => {
@@ -14,8 +16,8 @@ const updateCoachDB = async (id: string, data: TCoach) => {
     return coach
 }
 
+
 const bookSeatDB = async (id: string, seatNumbers: string[]) => {
-    console.log(id, seatNumbers)
     try {
         const coach = await Coach.findById(id);
 
@@ -34,12 +36,21 @@ const bookSeatDB = async (id: string, seatNumbers: string[]) => {
 
         // Save the updated coach document
         await coach.save();
+  
+        // Send message to all connected clients
+        wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+                console.log('Sending message to client');
+                client.send('updatedSeats'); // Customize message as needed
+            }
+        });
 
         return coach;
     } catch (error: any) {
         throw new Error(`Error booking seats: ${error.message}`);
     }
 };
+
 
 
 
@@ -61,6 +72,12 @@ const unbookSeatDB = async (id: string, seatNumbers: string[]) => {
 
         // Save the updated coach document
         await coach.save();
+        wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+                console.log('Sending message to client');
+                client.send('updatedSeats'); // Customize message as needed
+            }
+        });
 
         return coach;
     } catch (error: any) {
