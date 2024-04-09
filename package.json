@@ -2,7 +2,7 @@
   "name": "bookticketbackend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start:prod": "nodemon dist/app/server.js",
     "start:dev": "ts-node-dev --respawn --transpile-only src/app/server.ts",
