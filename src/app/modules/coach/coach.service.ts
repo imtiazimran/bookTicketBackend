@@ -41,7 +41,7 @@ const bookSeatDB = async (id: string, seatNumbers: string[]) => {
         wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 console.log('Sending message to client');
-                client.send('updatedSeats'); // Customize message as needed
+                client.send('success'); // Customize message as needed
             }
         });
 
@@ -75,7 +75,7 @@ const unbookSeatDB = async (id: string, seatNumbers: string[]) => {
         wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 console.log('Sending message to client');
-                client.send('updatedSeats'); // Customize message as needed
+                client.send('success'); // Customize message as needed
             }
         });
 

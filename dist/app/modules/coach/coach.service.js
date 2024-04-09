@@ -10,6 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CoachService = void 0;
+const ws_1 = require("ws");
+const server_1 = require("../../server");
 const coach_model_1 = require("./coach.model");
 const createNewCoachDB = (data) => __awaiter(void 0, void 0, void 0, function* () {
     const coach = yield coach_model_1.Coach.create(data);
@@ -24,7 +26,6 @@ const updateCoachDB = (id, data) => __awaiter(void 0, void 0, void 0, function* 
     return coach;
 });
 const bookSeatDB = (id, seatNumbers) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(id, seatNumbers);
     try {
         const coach = yield coach_model_1.Coach.findById(id);
         if (!coach) {
@@ -38,6 +39,13 @@ const bookSeatDB = (id, seatNumbers) => __awaiter(void 0, void 0, void 0, functi
         coach.bookedSeats = updatedBookedSeats;
         // Save the updated coach document
         yield coach.save();
+        // Send message to all connected clients
+        server_1.wss.clients.forEach((client) => {
+            if (client.readyState === ws_1.WebSocket.OPEN) {
+                console.log('Sending message to client');
+                client.send('success'); // Customize message as needed
+            }
+        });
         return coach;
     }
     catch (error) {
@@ -59,6 +67,12 @@ const unbookSeatDB = (id, seatNumbers) => __awaiter(void 0, void 0, void 0, func
         });
         // Save the updated coach document
         yield coach.save();
+        server_1.wss.clients.forEach((client) => {
+            if (client.readyState === ws_1.WebSocket.OPEN) {
+                console.log('Sending message to client');
+                client.send('success'); // Customize message as needed
+            }
+        });
         return coach;
     }
     catch (error) {

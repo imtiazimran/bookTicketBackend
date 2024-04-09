@@ -12,21 +12,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importDefault(require("mongoose"));
+exports.wss = void 0;
 const config_1 = __importDefault(require("./config"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const ws_1 = require("ws");
 const app_1 = __importDefault(require("./app"));
-function server() {
+// Define wss variable outside the startServers function
+let wss;
+function startServers() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield mongoose_1.default.connect(config_1.default.DB);
-            console.log("Connected to MongoDB successfully!");
-            app_1.default.listen(config_1.default.port, () => {
-                console.log(`Server is running on port ${config_1.default.port}`);
+            console.log('Connected to MongoDB.');
+            const PORT = config_1.default.port || 4000;
+            const server = app_1.default.listen(PORT, () => {
+                console.log(`HTTP server running on port ${PORT}`);
+            });
+            exports.wss = wss = new ws_1.WebSocketServer({ server }); // Assign the wss instance here
+            wss.on('connection', (ws) => {
+                console.log('Client connected');
+                ws.on('message', (message) => {
+                    console.log(message.toString('utf-8'));
+                    ws.send('Hello, client!');
+                });
             });
         }
         catch (error) {
-            console.log(error);
+            console.error('Error starting servers:', error);
         }
     });
 }
-server();
+startServers();

@@ -32,14 +32,6 @@ const getCoaches = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
         coach: sortedCoaches
     });
 }));
-// const getCoaches = catchAsynce(async (req, res) => {
-//     const coaches = await CoachService.getCoachesDB().sort({ updatedAt: -1 }).exec();
-//     res.status(200).json({
-//         success: true,
-//         message: "Coaches fetched successfully",
-//         coaches
-//     });
-// });
 const getCoach = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const coach = yield coach_service_1.CoachService.getCoachDB(req.params.id);
     res.status(200).json({
@@ -60,6 +52,10 @@ const bookSeat = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 
     try {
         const { id } = req.params;
         const { bookedSeats } = req.body;
+        // if (!wss) {
+        //     throw new Error('WebSocket server is not initialized');
+        // }
+        // Call bookSeatDB with wss instance
         const coach = yield coach_service_1.CoachService.bookSeatDB(id, bookedSeats);
         res.status(200).json({
             success: true,
