@@ -11,6 +11,14 @@ const userSchema = new Schema<Tuser>({
     email: {
         type: String,
         unique: true
+    },
+    role: {
+        type: String,
+        default: 'user'
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true

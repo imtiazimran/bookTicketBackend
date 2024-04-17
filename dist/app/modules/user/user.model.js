@@ -13,6 +13,14 @@ const userSchema = new mongoose_1.Schema({
     email: {
         type: String,
         unique: true
+    },
+    role: {
+        type: String,
+        default: 'user'
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
