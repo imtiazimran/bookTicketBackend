@@ -12,7 +12,7 @@ const router = express.Router();
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID as string, // Your client id string
     clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, // Your client secret string
-    callbackURL: 'http://localhost:3000/auth/google/callback'
+    callbackURL: 'https://bookticketbackend.onrender.com/auth/google/callback'
 }, async (accessToken, refreshToken, profile, done) => {
     const user = profile._json;
 
