@@ -1,27 +1,41 @@
 import express from 'express';
-import session from 'express-session';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import { User } from '../modules/user/user.model';
 
 
 const router = express.Router();
 
-router.use(session({ secret: 'your_secret_key', resave: false, saveUninitialized: true }));
 
-// Initialize Passport.js 
-router.use(passport.initialize());
-router.use(passport.session());
 
 // Define Google OAuth 2.0 Strategy
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID as string, // Your client id string
     clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, // Your client secret string
-    callbackURL: '/auth/google/callback'
-}, (accessToken, refreshToken, profile, done) => {
-    // Verify or create user in the database
-    // Call done(null, user) when finished
-    console.log(accessToken, profile._json)
+    callbackURL: 'http://localhost:3000/auth/google/callback'
+}, async (accessToken, refreshToken, profile, done) => {
+    const user = profile._json;
+
+    try {
+        let foundUser = await User.findOne({ email: user.email });
+
+        if (foundUser) {
+            return done(null, foundUser);
+        } else {
+            const newUser = new User({
+                name: user.name,
+                email: user.email,
+                picture: user.picture
+            });
+
+            let savedUser = await newUser.save();
+            return done(null, savedUser, { message: 'New user created' });
+        }
+    } catch (error : any) {
+        return done(error);
+    }
 }));
+
 
 // Serialize and Deserialize user
 passport.serializeUser((user, done) => {
@@ -37,33 +51,60 @@ router.get('/auth/google',
     passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' }),
+    passport.authenticate('google', { failureRedirect: '/fail' }),
     (req, res) => {
         // Successful authentication, redirect home.
         const code = req.query.code
-        console.log(code)
-        res.redirect('/');
+        res.redirect('/success');
     });
 
-router.get('/logout', (req, res) => {
-    req.logout();
-    res.redirect('/');
+router.get('/logout', function (req, res, next) {
+    req.logout(function (err) {
+        if (err) { return next(err); }
+        res.redirect('/bye');
+    });
+
 });
 
 // Protect routes
-function isAuthenticated(req: { isAuthenticated: () => any; }, res: { redirect: (arg0: string) => void; }, next: () => any) {
+const isAuthenticated = (req: any, res: any, next: any) => {
     if (req.isAuthenticated()) {
-        return next();
+        next()
     }
-    res.redirect('/');
+    else {
+        res.status(401).json({ success: false, message: "Unauthorized" })
+    }
 }
 
-router.get('/', (req, res) => {
-    res.send('Home Page');
+router.get('/success', (req, res) => {
+    if (req.isAuthenticated()) {
+        console.log(req.user)
+        res.status(200).json({
+            success: true,
+            message: `Login Successful`,
+        })
+    }
+    else {
+        res.status(401).json({ success: false, message: "Login Failed" })
+    }
+})
+router.get('/fail', (req, res) => {
+    res.status(401).json({ success: false, message: "Login Failed" })
+})
+
+router.get('/bye', (req, res) => {
+    res.status(200).json({ success: true, message: "Logout Successful" })
 });
 
+
+
+
 router.get('/profile', isAuthenticated, (req, res) => {
-    res.send('Profile Page');
+    res.status(200).json({
+        success: true,
+        message: "Profile Page",
+        data: req.user
+    })
 });
 
 export const authRoute = router

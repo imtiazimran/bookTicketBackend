@@ -2,7 +2,15 @@ import express, { Application, Request, Response } from "express";
 import cors from 'cors'
 import { CoachRoute } from "./modules/coach/coach.route";
 import { authRoute } from "./authorization/googleAuth";
+import passport from "passport";
+import session from "express-session";
 const app: Application = express()
+
+app.use(session({ secret: 'keyboard cat', resave: false, saveUninitialized: true }));
+
+// Initialize Passport.js 
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.json())
 app.use(cors())
