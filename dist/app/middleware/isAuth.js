@@ -12,7 +12,10 @@ const isAuth = (req, res, next) => {
     }
     jsonwebtoken_1.default.verify(token, secret, (err, decoded) => {
         if (err) {
-            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+            return res.status(401).json({
+                message: 'Unauthorized: Invalid token',
+                err
+            });
         }
         else {
             let decodedPayload;
@@ -21,7 +24,10 @@ const isAuth = (req, res, next) => {
                     decodedPayload = JSON.parse(decoded);
                 }
                 catch (error) {
-                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                    return res.status(401).json({
+                        message: 'Unauthorized: Invalid token',
+                        error
+                    });
                 }
             }
             else {

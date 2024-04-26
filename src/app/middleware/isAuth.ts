@@ -17,14 +17,20 @@ const isAuth = (req: Request, res: Response, next: NextFunction) => {
 
     jwt.verify(token, secret, (err, decoded) => {
         if (err) {
-            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+            return res.status(401).json({
+                 message: 'Unauthorized: Invalid token',
+                 err
+                 });
         } else {
             let decodedPayload: JwtPayload | undefined;
             if (typeof decoded === 'string') {
                 try {
                     decodedPayload = JSON.parse(decoded);
                 } catch (error) {
-                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                    return res.status(401).json({
+                         message: 'Unauthorized: Invalid token',
+                         error
+                        });
                 }
             } else {
                 decodedPayload = decoded;
