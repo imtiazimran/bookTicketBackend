@@ -1,6 +1,7 @@
 import { WebSocket } from "ws"
 import { wss } from "../../server"
 import { Coach } from "./coach.model"
+import {  TCoach } from "./coach.interface"
 
 const createNewCoachDB = async (data: TCoach) => {
     const coach = await Coach.create(data)
@@ -17,7 +18,7 @@ const updateCoachDB = async (id: string, data: TCoach) => {
 }
 
 
-const bookSeatDB = async (id: string, seatNumbers: string[]) => {
+const bookSeatDB = async (id: string, userId: string, seatNumbers: string[]) => {
     try {
         const coach = await Coach.findById(id);
 
@@ -25,18 +26,20 @@ const bookSeatDB = async (id: string, seatNumbers: string[]) => {
             throw new Error('Coach not found');
         }
 
-        // Ensure coach.bookedSeats is an array
-        const bookedSeats: string[] = Array.isArray(coach.bookedSeats) ? coach.bookedSeats : [];
 
-        // Merge new seat numbers with existing booked seats
-        const updatedBookedSeats = [...new Set([...bookedSeats, ...seatNumbers])];
+        // Create new booking instance
+        const newBooking = {
+            userId, // Assuming you're creating new booking, you might need to replace this with actual user ID
+            coachId: id,
+            seatNumber: seatNumbers
+        };
 
-        // Update the bookedSeats array with the new seat numbers
-        coach.bookedSeats = updatedBookedSeats;
+        // Push the new booking to the bookedSeats array
+        coach.bookedSeats.push(newBooking);
 
         // Save the updated coach document
         await coach.save();
-  
+
         // Send message to all connected clients
         wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
@@ -50,8 +53,31 @@ const bookSeatDB = async (id: string, seatNumbers: string[]) => {
         throw new Error(`Error booking seats: ${error.message}`);
     }
 };
+// const bookSeatDB = async (coachId: string, userId: string, seatNumber: string[]) => {
+//     const data = {
+//         userId,
+//         coachId,
+//         seatNumber,
+//     }
 
+//     console.log(data);
+//     try {
 
+//         const res = await BookingModel.create(data);
+
+//         // Send message to all connected clients
+//         wss.clients.forEach((client) => {
+//             if (client.readyState === WebSocket.OPEN) {
+//                 console.log('Sending message to client');
+//                 client.send('success'); // Customize message as needed
+//             }
+//         });
+
+//         return res;
+//     } catch (error: any) {
+//         throw new Error(`Error booking seats: ${error.message}`);
+//     }
+// };
 
 
 const unbookSeatDB = async (id: string, seatNumbers: string[]) => {
@@ -94,6 +120,10 @@ const getCoachesDB = async () => {
 
 const getCoachDB = async (id: string) => {
     const coach = await Coach.findOne({ _id: id })
+    .populate({
+        path: "bookedSeats.userId",
+        select: "name picture email"
+    })
     return coach
 }
 

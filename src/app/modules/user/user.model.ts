@@ -14,6 +14,7 @@ const userSchema = new Schema<Tuser>({
     },
     role: {
         type: String,
+        enum: ['user', 'admin', 'manager'],
         default: 'user'
     },
     isDeleted: {

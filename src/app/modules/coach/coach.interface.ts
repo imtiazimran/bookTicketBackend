@@ -1,10 +1,17 @@
+import mongoose from "mongoose";
 
-
-type TCoach = {
+export interface TBooking {
+    [x: string]: any;
+    push: any;
+    userId: string
+    coachId: string
+    seatNumber: string[];
+}
+export type TCoach = {
     name: string
     image: string
     number: string
-    bookedSeats: string[]
+    bookedSeats: TBooking
     departure: Date
     price: number
     seats: number,

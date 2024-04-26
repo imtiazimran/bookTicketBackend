@@ -1,4 +1,5 @@
 
+import { Request } from "../../middleware/isAuth";
 import catchAsync from "../../utils/catchAsync";
 import { CoachService } from "./coach.service";
 
@@ -40,17 +41,20 @@ const updateCoach = catchAsync(async (req, res) => {
     })
 })
 
-const bookSeat = catchAsync(async (req, res) => {
+const bookSeat = catchAsync(async (req: Request, res) => {
     try {
         const { id } = req.params;
         const { bookedSeats } = req.body;
+        if (!req.user || typeof req.user !== 'object') {
+            return res.status(401).json({ success: false, message: 'Unauthorized: User not found' });
+        }
 
         // if (!wss) {
         //     throw new Error('WebSocket server is not initialized');
         // }
 
         // Call bookSeatDB with wss instance
-        const coach = await CoachService.bookSeatDB(id, bookedSeats);
+        const coach = await CoachService.bookSeatDB(id,req.id as string, bookedSeats);
 
         res.status(200).json({
             success: true,

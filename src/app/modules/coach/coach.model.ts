@@ -1,5 +1,11 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
+import { TBooking, TCoach } from "./coach.interface";
 
+const bookingSchema: Schema = new Schema({
+  userId: { type: mongoose.Types.ObjectId, ref: 'User' }, // Reference to the User model
+  coachId: { type: mongoose.Types.ObjectId, ref: 'Coach' }, // Reference to the Coach model
+  seatNumber: { type: [String], required: true },
+});
 
 const coachSchema = new Schema<TCoach>({
     name: {
@@ -13,10 +19,7 @@ const coachSchema = new Schema<TCoach>({
         type: String,
         required: true
     },
-    bookedSeats: {
-        type: [String],
-        default: []
-    },
+    bookedSeats: [bookingSchema],
     departure: {
         type: Date,
         required: true

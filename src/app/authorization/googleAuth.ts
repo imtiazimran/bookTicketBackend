@@ -1,18 +1,16 @@
 import express from 'express';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import jwt, { Secret } from 'jsonwebtoken'; // Import jsonwebtoken
 import { User } from '../modules/user/user.model';
-
 
 const router = express.Router();
 
-
-
 // Define Google OAuth 2.0 Strategy
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID as string, // Your client id string
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, // Your client secret string
-    callbackURL: 'https://bookticketbackend.onrender.com/auth/google/callback'
+    clientID: process.env.GOOGLE_CLIENT_ID as string,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    callbackURL: '/auth/google/callback'
 }, async (accessToken, refreshToken, profile, done) => {
     const user = profile._json;
 
@@ -29,13 +27,12 @@ passport.use(new GoogleStrategy({
             });
 
             let savedUser = await newUser.save();
-            return done(null, savedUser, { message: 'New user created' });
+            return done(null, savedUser);
         }
-    } catch (error : any) {
+    } catch (error: any) {
         return done(error);
     }
 }));
-
 
 // Serialize and Deserialize user
 passport.serializeUser((user, done) => {
@@ -48,63 +45,43 @@ passport.deserializeUser((user, done) => {
 
 // Auth Routes
 router.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] }));
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+);
 
 router.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/fail' }),
     (req, res) => {
-        // Successful authentication, redirect home.
-        const code = req.query.code
-        res.redirect('/success');
-    });
+        // Successful authentication, generate JWT token
+        const token = jwt.sign({ user: req.user }, process.env.JWT_SECRET_KEY as Secret); // Change 'secret_key' to your preferred secret key
+        res.status(200).json({ success: true, token });
+    }
+);
 
+// Logout Route
 router.get('/logout', function (req, res, next) {
     req.logout(function (err) {
         if (err) { return next(err); }
         res.redirect('/bye');
     });
-
 });
 
-// Protect routes
-const isAuthenticated = (req: any, res: any, next: any) => {
-    if (req.isAuthenticated()) {
-        next()
-    }
-    else {
-        res.status(401).json({ success: false, message: "Unauthorized" })
-    }
-}
-
-router.get('/success', (req, res) => {
-    if (req.isAuthenticated()) {
-        console.log(req.user)
-        res.status(200).json({
-            success: true,
-            message: `Login Successful`,
-        })
-    }
-    else {
-        res.status(401).json({ success: false, message: "Login Failed" })
-    }
-})
-router.get('/fail', (req, res) => {
-    res.status(401).json({ success: false, message: "Login Failed" })
-})
-
-router.get('/bye', (req, res) => {
-    res.status(200).json({ success: true, message: "Logout Successful" })
-});
-
-
-
-
-router.get('/profile', isAuthenticated, (req, res) => {
+// Profile Route (protected)
+router.get('/profile', passport.authenticate('jwt', { session: false }), (req, res) => {
     res.status(200).json({
         success: true,
         message: "Profile Page",
         data: req.user
-    })
+    });
 });
 
-export const authRoute = router
+// Failure Route
+router.get('/fail', (req, res) => {
+    res.status(401).json({ success: false, message: "Login Failed" });
+});
+
+// Bye Route
+router.get('/bye', (req, res) => {
+    res.status(200).json({ success: true, message: "Logout Successful" });
+});
+
+export const authRoute = router;

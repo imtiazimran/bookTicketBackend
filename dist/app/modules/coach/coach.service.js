@@ -25,18 +25,20 @@ const updateCoachDB = (id, data) => __awaiter(void 0, void 0, void 0, function* 
     const coach = yield coach_model_1.Coach.findOneAndUpdate({ _id: id }, data, { new: true });
     return coach;
 });
-const bookSeatDB = (id, seatNumbers) => __awaiter(void 0, void 0, void 0, function* () {
+const bookSeatDB = (id, userId, seatNumbers) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const coach = yield coach_model_1.Coach.findById(id);
         if (!coach) {
             throw new Error('Coach not found');
         }
-        // Ensure coach.bookedSeats is an array
-        const bookedSeats = Array.isArray(coach.bookedSeats) ? coach.bookedSeats : [];
-        // Merge new seat numbers with existing booked seats
-        const updatedBookedSeats = [...new Set([...bookedSeats, ...seatNumbers])];
-        // Update the bookedSeats array with the new seat numbers
-        coach.bookedSeats = updatedBookedSeats;
+        // Create new booking instance
+        const newBooking = {
+            userId, // Assuming you're creating new booking, you might need to replace this with actual user ID
+            coachId: id,
+            seatNumber: seatNumbers
+        };
+        // Push the new booking to the bookedSeats array
+        coach.bookedSeats.push(newBooking);
         // Save the updated coach document
         yield coach.save();
         // Send message to all connected clients
@@ -52,6 +54,27 @@ const bookSeatDB = (id, seatNumbers) => __awaiter(void 0, void 0, void 0, functi
         throw new Error(`Error booking seats: ${error.message}`);
     }
 });
+// const bookSeatDB = async (coachId: string, userId: string, seatNumber: string[]) => {
+//     const data = {
+//         userId,
+//         coachId,
+//         seatNumber,
+//     }
+//     console.log(data);
+//     try {
+//         const res = await BookingModel.create(data);
+//         // Send message to all connected clients
+//         wss.clients.forEach((client) => {
+//             if (client.readyState === WebSocket.OPEN) {
+//                 console.log('Sending message to client');
+//                 client.send('success'); // Customize message as needed
+//             }
+//         });
+//         return res;
+//     } catch (error: any) {
+//         throw new Error(`Error booking seats: ${error.message}`);
+//     }
+// };
 const unbookSeatDB = (id, seatNumbers) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const coach = yield coach_model_1.Coach.findById(id);
@@ -84,7 +107,11 @@ const getCoachesDB = () => __awaiter(void 0, void 0, void 0, function* () {
     return coach;
 });
 const getCoachDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const coach = yield coach_model_1.Coach.findOne({ _id: id });
+    const coach = yield coach_model_1.Coach.findOne({ _id: id })
+        .populate({
+        path: "bookedSeats.userId",
+        select: "name picture email"
+    });
     return coach;
 });
 exports.CoachService = {

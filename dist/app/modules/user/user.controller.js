@@ -24,11 +24,20 @@ const getAllUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
     });
 }));
 const getSingleUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_service_1.userService.getSingleUserFromDB(req.params.email);
+    if (!req.user || typeof req.user !== 'object') {
+        return res.status(401).json({ success: false, message: 'Unauthorized: User not found' });
+    }
+    // Assert the type of req.user to match the expected structure
+    const user = req.user; // Update the type definition as needed
+    const email = user.user.email;
+    if (!email) {
+        throw new Error("User not found");
+    }
+    const userData = yield user_service_1.userService.getSingleUserFromDB(email);
     res.status(200).json({
         success: true,
         message: "User fetched successfully",
-        user
+        userData
     });
 }));
 const updateUserInfo = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
