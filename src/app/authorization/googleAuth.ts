@@ -53,18 +53,12 @@ passport.deserializeUser((user, done) => {
 
 // Auth Routes
 router.get('/auth/google',
-    cors({
-        origin: 'http://localhost:5173',
-        credentials: true
-    }),
+    cors(),
     passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
 router.get('/auth/google/callback',
-    cors({
-        origin: 'http://localhost:5173',
-        credentials: true
-    }),
+    cors(),
     passport.authenticate('google', { failureRedirect: '/fail' },),
     (req, res) => {
         // Successful authentication, generate JWT token

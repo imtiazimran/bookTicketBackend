@@ -6,9 +6,7 @@ import passport from "passport";
 import session from "express-session";
 import { userRoute } from "./modules/user/user.route";
 import bodyParser from "body-parser";
-import { googleAuth } from "./authorization/googleOAuth";
 const app: Application = express()
-
 
 app.use(
     session({
@@ -25,7 +23,12 @@ app.use(passport.session());
 
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: [
+            'http://localhost:5173',
+            'https://bholatoctg.vercel.app',
+            'http://bholatoctg.netlify.app',
+            'https://bookticket-szt6.onrender.com'
+        ],
         methods: "GET,POST,PUT,PATCH,DELETE",
         credentials: true,
     })
@@ -36,7 +39,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use('/', authRoute)
-// app.use('/', googleAuth)
 app.use('/api/v1/coach', CoachRoute)
 app.use('/api/v1/user', userRoute)
 

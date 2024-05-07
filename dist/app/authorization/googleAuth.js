@@ -60,14 +60,8 @@ passport_1.default.deserializeUser((user, done) => {
     done(null, user);
 });
 // Auth Routes
-router.get('/auth/google', (0, cors_1.default)({
-    origin: 'http://localhost:5173',
-    credentials: true
-}), passport_1.default.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/auth/google/callback', (0, cors_1.default)({
-    origin: 'http://localhost:5173',
-    credentials: true
-}), passport_1.default.authenticate('google', { failureRedirect: '/fail' }), (req, res) => {
+router.get('/auth/google', (0, cors_1.default)(), passport_1.default.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/auth/google/callback', (0, cors_1.default)(), passport_1.default.authenticate('google', { failureRedirect: '/fail' }), (req, res) => {
     // Successful authentication, generate JWT token
     const token = jsonwebtoken_1.default.sign({ user: req.user }, process.env.JWT_SECRET_KEY); // Change 'secret_key' to your preferred secret key
     // res.redirect('http://localhost:5173')
