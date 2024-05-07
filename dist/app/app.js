@@ -22,12 +22,7 @@ app.use((0, express_session_1.default)({
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
 app.use((0, cors_1.default)({
-    origin: [
-        'http://localhost:5173',
-        'https://bholatoctg.vercel.app',
-        'http://bholatoctg.netlify.app',
-        'https://bookticket-szt6.onrender.com'
-    ],
+    origin: "http://localhost:5173",
     methods: "GET,POST,PUT,PATCH,DELETE",
     credentials: true,
 }));
@@ -35,6 +30,7 @@ app.use(express_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(body_parser_1.default.json());
 app.use('/', googleAuth_1.authRoute);
+// app.use('/', googleAuth)
 app.use('/api/v1/coach', coach_route_1.CoachRoute);
 app.use('/api/v1/user', user_route_1.userRoute);
 app.get('/', (req, res) => {

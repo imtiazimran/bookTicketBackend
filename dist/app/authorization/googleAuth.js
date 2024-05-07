@@ -18,12 +18,19 @@ const passport_1 = __importDefault(require("passport"));
 const passport_google_oauth20_1 = require("passport-google-oauth20");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken")); // Import jsonwebtoken
 const user_model_1 = require("../modules/user/user.model");
+const cors_1 = __importDefault(require("cors"));
 const router = express_1.default.Router();
+var corsOptions = {
+    origin: 'http://localhost:5173',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+};
 // Define Google OAuth 2.0 Strategy
 passport_1.default.use(new passport_google_oauth20_1.Strategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'https://bookticketbackend.onrender.com/auth/google/callback'
+    callbackURL: '/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => __awaiter(void 0, void 0, void 0, function* () {
     const user = profile._json;
     try {
@@ -53,10 +60,17 @@ passport_1.default.deserializeUser((user, done) => {
     done(null, user);
 });
 // Auth Routes
-router.get('/auth/google', passport_1.default.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/auth/google/callback', passport_1.default.authenticate('google', { failureRedirect: '/fail' }), (req, res) => {
+router.get('/auth/google', (0, cors_1.default)({
+    origin: 'http://localhost:5173',
+    credentials: true
+}), passport_1.default.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/auth/google/callback', (0, cors_1.default)({
+    origin: 'http://localhost:5173',
+    credentials: true
+}), passport_1.default.authenticate('google', { failureRedirect: '/fail' }), (req, res) => {
     // Successful authentication, generate JWT token
     const token = jsonwebtoken_1.default.sign({ user: req.user }, process.env.JWT_SECRET_KEY); // Change 'secret_key' to your preferred secret key
+    // res.redirect('http://localhost:5173')
     res.status(200).json({ success: true, token });
 });
 // Logout Route

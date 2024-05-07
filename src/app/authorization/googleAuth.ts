@@ -3,14 +3,22 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import jwt, { Secret } from 'jsonwebtoken'; // Import jsonwebtoken
 import { User } from '../modules/user/user.model';
+import cors from 'cors';
 
 const router = express.Router();
+
+var corsOptions = {
+    origin: 'http://localhost:5173',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+};
 
 // Define Google OAuth 2.0 Strategy
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID as string,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    callbackURL: 'https://bookticketbackend.onrender.com/auth/google/callback'
+    callbackURL: '/auth/google/callback'
 }, async (accessToken, refreshToken, profile, done) => {
     const user = profile._json;
 
@@ -45,14 +53,23 @@ passport.deserializeUser((user, done) => {
 
 // Auth Routes
 router.get('/auth/google',
+    cors({
+        origin: 'http://localhost:5173',
+        credentials: true
+    }),
     passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
 router.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/fail' }),
+    cors({
+        origin: 'http://localhost:5173',
+        credentials: true
+    }),
+    passport.authenticate('google', { failureRedirect: '/fail' },),
     (req, res) => {
         // Successful authentication, generate JWT token
         const token = jwt.sign({ user: req.user }, process.env.JWT_SECRET_KEY as Secret); // Change 'secret_key' to your preferred secret key
+        // res.redirect('http://localhost:5173')
         res.status(200).json({ success: true, token });
     }
 );
