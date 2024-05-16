@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CoachController = void 0;
+const isAuth_1 = __importDefault(require("../../middleware/isAuth"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const coach_service_1 = require("./coach.service");
 const createNewCoach = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -33,6 +34,9 @@ const getCoaches = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
     });
 }));
 const getCoach = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield (0, isAuth_1.default)({ token: req.query.token }, req, res);
+    // console.log({user});
+    // console.log("inside request", req.user);
     const coach = yield coach_service_1.CoachService.getCoachDB(req.params.id);
     res.status(200).json({
         success: true,
@@ -49,9 +53,11 @@ const updateCoach = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
     });
 }));
 const bookSeat = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield (0, isAuth_1.default)({ token: req.query.token }, req, res);
     try {
         const { id } = req.params;
         const { bookedSeats } = req.body;
+        console.log("inside book seat", req.query.token, user);
         if (!req.user || typeof req.user !== 'object') {
             return res.status(401).json({ success: false, message: 'Unauthorized: User not found' });
         }
@@ -59,7 +65,7 @@ const bookSeat = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 
         //     throw new Error('WebSocket server is not initialized');
         // }
         // Call bookSeatDB with wss instance
-        const coach = yield coach_service_1.CoachService.bookSeatDB(id, req.id, bookedSeats);
+        const coach = yield coach_service_1.CoachService.bookSeatDB(id, req.user._id, bookedSeats);
         res.status(200).json({
             success: true,
             message: "Seat booked successfully",
@@ -72,6 +78,7 @@ const bookSeat = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 
     }
 }));
 const unBookSeat = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // console.log("inside unbook seat",req.body);
     try {
         const { id } = req.params;
         const { seatNumbers } = req.body;

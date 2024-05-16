@@ -1,5 +1,5 @@
 
-import { Request } from "../../middleware/isAuth";
+import isAuth, { Request } from "../../middleware/isAuth";
 import catchAsync from "../../utils/catchAsync";
 import { CoachService } from "./coach.service";
 
@@ -24,6 +24,9 @@ const getCoaches = catchAsync(async (req, res) => {
 });
 
 const getCoach = catchAsync(async (req, res) => {
+    const user = await isAuth({token: req.query.token as string}, req, res)
+    // console.log({user});
+    // console.log("inside request", req.user);
     const coach = await CoachService.getCoachDB(req.params.id)
     res.status(200).json({
         success: true,
@@ -42,9 +45,11 @@ const updateCoach = catchAsync(async (req, res) => {
 })
 
 const bookSeat = catchAsync(async (req: Request, res) => {
+    const user = await isAuth({token: req.query.token as string}, req, res)
     try {
         const { id } = req.params;
         const { bookedSeats } = req.body;
+        console.log("inside book seat",req.query.token, user);
         if (!req.user || typeof req.user !== 'object') {
             return res.status(401).json({ success: false, message: 'Unauthorized: User not found' });
         }
@@ -54,7 +59,7 @@ const bookSeat = catchAsync(async (req: Request, res) => {
         // }
 
         // Call bookSeatDB with wss instance
-        const coach = await CoachService.bookSeatDB(id,req.id as string, bookedSeats);
+        const coach = await CoachService.bookSeatDB(id,req.user._id as string, bookedSeats);
 
         res.status(200).json({
             success: true,
@@ -68,6 +73,7 @@ const bookSeat = catchAsync(async (req: Request, res) => {
 });
 
 const unBookSeat = catchAsync(async (req, res) => {
+    // console.log("inside unbook seat",req.body);
     try {
         const { id } = req.params;
         const { seatNumbers } = req.body;

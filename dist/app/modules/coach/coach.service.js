@@ -81,27 +81,30 @@ const unbookSeatDB = (id, seatNumbers) => __awaiter(void 0, void 0, void 0, func
         if (!coach) {
             throw new Error('Coach not found');
         }
-        // Remove each unbooked seat from the bookedSeats array
-        seatNumbers.forEach(seat => {
-            const index = coach.bookedSeats.indexOf(seat);
-            if (index !== -1) {
-                coach.bookedSeats.splice(index, 1);
-            }
+        console.log('Incoming seat numbers:', seatNumbers);
+        // Iterate over each seat booking entry in bookedSeats
+        coach.bookedSeats.forEach((booking) => {
+            // Filter out the seat numbers that need to be unbooked
+            booking.seatNumber = booking.seatNumber.filter((seat) => !seatNumbers.includes(seat));
         });
+        // Remove any booking entry that now has an empty seatNumber array
+        coach.bookedSeats = coach.bookedSeats.filter((booking) => booking.seatNumber.length > 0);
         // Save the updated coach document
         yield coach.save();
-        server_1.wss.clients.forEach((client) => {
-            if (client.readyState === ws_1.WebSocket.OPEN) {
-                console.log('Sending message to client');
-                client.send('success'); // Customize message as needed
-            }
-        });
+        // Example code for WebSocket communication, uncomment if needed
+        // wss.clients.forEach((client) => {
+        //     if (client.readyState === WebSocket.OPEN) {
+        //         console.log('Sending message to client');
+        //         client.send('success'); // Customize message as needed
+        //     }
+        // });
         return coach;
     }
     catch (error) {
         throw new Error(`Error unbooking seats: ${error.message}`);
     }
 });
+exports.default = unbookSeatDB;
 const getCoachesDB = () => __awaiter(void 0, void 0, void 0, function* () {
     const coach = yield coach_model_1.Coach.find();
     return coach;

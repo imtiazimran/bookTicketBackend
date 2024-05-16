@@ -88,28 +88,35 @@ const unbookSeatDB = async (id: string, seatNumbers: string[]) => {
             throw new Error('Coach not found');
         }
 
-        // Remove each unbooked seat from the bookedSeats array
-        seatNumbers.forEach(seat => {
-            const index = coach.bookedSeats.indexOf(seat);
-            if (index !== -1) {
-                coach.bookedSeats.splice(index, 1);
-            }
+        console.log('Incoming seat numbers:', seatNumbers);
+
+        // Iterate over each seat booking entry in bookedSeats
+        coach.bookedSeats.forEach((booking: { seatNumber: any[] }) => {
+            // Filter out the seat numbers that need to be unbooked
+            booking.seatNumber = booking.seatNumber.filter((seat: string) => !seatNumbers.includes(seat));
         });
+
+        // Remove any booking entry that now has an empty seatNumber array
+        coach.bookedSeats = coach.bookedSeats.filter((booking: { seatNumber: string | any[] }) => booking.seatNumber.length > 0);
 
         // Save the updated coach document
         await coach.save();
-        wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-                console.log('Sending message to client');
-                client.send('success'); // Customize message as needed
-            }
-        });
+
+        // Example code for WebSocket communication, uncomment if needed
+        // wss.clients.forEach((client) => {
+        //     if (client.readyState === WebSocket.OPEN) {
+        //         console.log('Sending message to client');
+        //         client.send('success'); // Customize message as needed
+        //     }
+        // });
 
         return coach;
     } catch (error: any) {
         throw new Error(`Error unbooking seats: ${error.message}`);
     }
 };
+
+export default unbookSeatDB;
 
 
 
@@ -119,6 +126,7 @@ const getCoachesDB = async () => {
 }
 
 const getCoachDB = async (id: string) => {
+   
     const coach = await Coach.findOne({ _id: id })
     .populate({
         path: "bookedSeats.userId",

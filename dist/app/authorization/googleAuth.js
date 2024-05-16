@@ -30,7 +30,7 @@ var corsOptions = {
 passport_1.default.use(new passport_google_oauth20_1.Strategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'https://bookticketbackend.onrender.com/auth/google/callback'
+    callbackURL: '/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => __awaiter(void 0, void 0, void 0, function* () {
     const user = profile._json;
     try {
