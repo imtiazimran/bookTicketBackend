@@ -16,6 +16,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_model_1 = require("../modules/user/user.model");
 const secret = process.env.JWT_SECRET_KEY;
 const isAuth = (_a, req_1, res_1) => __awaiter(void 0, [_a, req_1, res_1], void 0, function* ({ token }, req, res) {
+    // console.log("inside auth middlewere",token);
     if (!token) {
         return { success: false, message: 'Unauthorized: No token provided' };
     }
@@ -27,12 +28,13 @@ const isAuth = (_a, req_1, res_1) => __awaiter(void 0, [_a, req_1, res_1], void 
         // console.log(decodedPayload)
         let user = yield user_model_1.User.findOne({ email: decodedPayload.email });
         if (!user) {
-            user = yield user_model_1.User.create(decodedPayload.user);
+            user = yield user_model_1.User.create(decodedPayload);
         }
         req.user = user;
         return user;
     }
     catch (error) {
+        console.log(error);
         return { success: false, message: 'Internal Server Error from auth', error };
     }
 });

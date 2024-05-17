@@ -24,6 +24,7 @@ export type TUser = {
 const secret = process.env.JWT_SECRET_KEY as Secret;
 
 const isAuth = async ({ token }: { token: string }, req: Request, res: Response) => {
+    // console.log("inside auth middlewere",token);
    
     if (!token) {
         return { success: false, message: 'Unauthorized: No token provided' };
@@ -40,12 +41,13 @@ const isAuth = async ({ token }: { token: string }, req: Request, res: Response)
         let user = await User.findOne({ email: decodedPayload.email });
 
         if (!user) {
-            user = await User.create(decodedPayload.user);
+            user = await User.create(decodedPayload);
         }
 
         req.user = user;
         return user;
     } catch (error) {
+        console.log(error);
         return { success: false, message: 'Internal Server Error from auth', error };
     }
 };
