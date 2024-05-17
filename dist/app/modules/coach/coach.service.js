@@ -81,7 +81,7 @@ const unbookSeatDB = (id, seatNumbers) => __awaiter(void 0, void 0, void 0, func
         if (!coach) {
             throw new Error('Coach not found');
         }
-        console.log('Incoming seat numbers:', seatNumbers);
+        // console.log('Incoming seat numbers:', seatNumbers);
         // Iterate over each seat booking entry in bookedSeats
         coach.bookedSeats.forEach((booking) => {
             // Filter out the seat numbers that need to be unbooked

@@ -88,7 +88,7 @@ const unbookSeatDB = async (id: string, seatNumbers: string[]) => {
             throw new Error('Coach not found');
         }
 
-        console.log('Incoming seat numbers:', seatNumbers);
+        // console.log('Incoming seat numbers:', seatNumbers);
 
         // Iterate over each seat booking entry in bookedSeats
         coach.bookedSeats.forEach((booking: { seatNumber: any[] }) => {

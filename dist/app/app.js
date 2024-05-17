@@ -24,7 +24,7 @@ app.use(passport_1.default.session());
 app.use((0, cors_1.default)({
     origin: [
         'http://localhost:5173',
-        'https://bholatoctg.vercel.app',
+        'https://imunet.vercel.app',
         'http://bholatoctg.netlify.app',
         'https://bookticket-szt6.onrender.com'
     ],

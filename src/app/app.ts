@@ -25,7 +25,7 @@ app.use(
     cors({
         origin: [
             'http://localhost:5173',
-            'https://bholatoctg.vercel.app',
+            'https://imunet.vercel.app',
             'http://bholatoctg.netlify.app',
             'https://bookticket-szt6.onrender.com'
         ],
