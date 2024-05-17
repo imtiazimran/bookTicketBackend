@@ -49,7 +49,7 @@ const bookSeat = catchAsync(async (req: Request, res) => {
     try {
         const { id } = req.params;
         const { bookedSeats } = req.body;
-        console.log("inside book seat",req.query.token, user);
+        // console.log("inside book seat",req.query.token, user);
         if (!req.user || typeof req.user !== 'object') {
             return res.status(401).json({ success: false, message: 'Unauthorized: User not found' });
         }

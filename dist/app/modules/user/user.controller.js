@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userController = void 0;
+const isAuth_1 = __importDefault(require("../../middleware/isAuth"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const user_service_1 = require("./user.service");
 const getAllUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -24,15 +25,16 @@ const getAllUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
     });
 }));
 const getSingleUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!req.user || typeof req.user !== 'object') {
-        return res.status(401).json({ success: false, message: 'Unauthorized: User not found' });
+    // console.log(req.query.token);
+    const auth = yield (0, isAuth_1.default)({ token: req.query.token }, req, res);
+    // Type guard to check if auth is a TUser object
+    function isAuthenticatedUser(auth) {
+        return auth && typeof auth === 'object' && 'email' in auth;
     }
-    // Assert the type of req.user to match the expected structure
-    const user = req.user; // Update the type definition as needed
-    const email = user.user.email;
-    if (!email) {
-        throw new Error("User not found");
+    if (!isAuthenticatedUser(auth)) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: Invalid token' });
     }
+    const email = auth.email;
     const userData = yield user_service_1.userService.getSingleUserFromDB(email);
     res.status(200).json({
         success: true,

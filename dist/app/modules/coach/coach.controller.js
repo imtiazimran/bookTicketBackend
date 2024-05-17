@@ -57,7 +57,7 @@ const bookSeat = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 
     try {
         const { id } = req.params;
         const { bookedSeats } = req.body;
-        console.log("inside book seat", req.query.token, user);
+        // console.log("inside book seat",req.query.token, user);
         if (!req.user || typeof req.user !== 'object') {
             return res.status(401).json({ success: false, message: 'Unauthorized: User not found' });
         }

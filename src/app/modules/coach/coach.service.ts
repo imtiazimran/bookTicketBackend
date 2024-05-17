@@ -53,31 +53,6 @@ const bookSeatDB = async (id: string, userId: string, seatNumbers: string[]) => 
         throw new Error(`Error booking seats: ${error.message}`);
     }
 };
-// const bookSeatDB = async (coachId: string, userId: string, seatNumber: string[]) => {
-//     const data = {
-//         userId,
-//         coachId,
-//         seatNumber,
-//     }
-
-//     console.log(data);
-//     try {
-
-//         const res = await BookingModel.create(data);
-
-//         // Send message to all connected clients
-//         wss.clients.forEach((client) => {
-//             if (client.readyState === WebSocket.OPEN) {
-//                 console.log('Sending message to client');
-//                 client.send('success'); // Customize message as needed
-//             }
-//         });
-
-//         return res;
-//     } catch (error: any) {
-//         throw new Error(`Error booking seats: ${error.message}`);
-//     }
-// };
 
 
 const unbookSeatDB = async (id: string, seatNumbers: string[]) => {

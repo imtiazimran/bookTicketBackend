@@ -9,7 +9,6 @@ export interface Request extends ExpressRequest {
 }
 
 export type TUser = {
-    user(user: any): (import("mongoose").Document<unknown, {}, Tuser> & Tuser & { _id: import("mongoose").Types.ObjectId; }) | PromiseLike<(import("mongoose").Document<unknown, {}, Tuser> & Tuser & { _id: import("mongoose").Types.ObjectId; }) | null> | null;
     role: string,
     isDeleted: boolean,
     _id: string,
